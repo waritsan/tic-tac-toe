@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import axios from 'axios';
 import './index.css';
 
+// const serverUri = 'https://tic-tac-toe-api-server.herokuapp.com/api/boards/create'
+const serverUri = 'http://localhost:8080/api/boards/create'
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -99,6 +102,28 @@ class Game extends React.Component {
     });
   }
 
+  saveBoard() {
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+
+    axios({
+      url: serverUri,
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      data: {
+        squares: squares
+      }
+    })
+    .then(function (response) {
+      alert(response.data.squares);
+      console.log(response);
+    })
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -133,6 +158,7 @@ class Game extends React.Component {
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
+          <button onClick={() => this.saveBoard()}>Save</button>
         </div>
       </div>
     );
