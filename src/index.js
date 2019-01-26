@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+import Button from '@material-ui/core/Button';
 import './index.css';
 
-// const serverUri = 'https://tic-tac-toe-api-server.herokuapp.com/api/boards/create'
-const serverUri = 'http://localhost:8080/api/boards/create'
+const serverUri = process.env.SERVER_URI || 'http://localhost:8080/api/boards/'
+
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -52,8 +53,10 @@ class Game extends React.Component {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
-        col: 0,
-        row: 0,
+        position: {
+          row: 0,
+          col: 0,
+        }
       }],
       stepNumber: 0,
       xIsNext: true,
@@ -68,27 +71,10 @@ class Game extends React.Component {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
-    var col;
-    var row;
-    if ([0, 3, 6].includes(i)) {
-      col = 1;
-    } else if ([1, 4, 7].includes(i)) {
-      col = 2;
-    } else {
-      col = 3;
-    }
-    if ([0, 1, 2].includes(i)) {
-      row = 1;
-    } else if ([3, 4, 5].includes(i)) {
-      row = 2;
-    } else {
-      row = 3;
-    }
     this.setState({
       history: history.concat([{
         squares: squares,
-        col: col,
-        row: row,
+        position: calculatePosition(i),
       }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
@@ -103,24 +89,19 @@ class Game extends React.Component {
   }
 
   saveBoard() {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
-
     axios({
-      url: serverUri,
+      url: serverUri + 'create',
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       data: {
-        squares: squares
+        history: this.state.history
       }
     })
-    .then(function (response) {
-      alert(response.data.squares);
-      console.log(response);
+    .then(function (res) {
+      alert(res.status)
     })
   }
 
@@ -135,7 +116,7 @@ class Game extends React.Component {
         'Go to game start';
       return (
         <li key={move}>
-          ({step.col}, {step.row})
+          ({step.position.col}, {step.position.row})
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
@@ -154,11 +135,14 @@ class Game extends React.Component {
             squares={current.squares}
             onClick={(i) => this.handleClick(i)}
           />
+          <Button variant="contained" color="primary" onClick={() => this.saveBoard()}>
+            Save
+          </Button>
+          {/* <button onClick={() => this.saveBoard()}>Save</button> */}
         </div>
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
-          <button onClick={() => this.saveBoard()}>Save</button>
         </div>
       </div>
     );
@@ -171,6 +155,26 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
+
+function calculatePosition(i) {
+  var col;
+  var row;
+  if ([0, 3, 6].includes(i)) {
+    col = 1;
+  } else if ([1, 4, 7].includes(i)) {
+    col = 2;
+  } else {
+    col = 3;
+  }
+  if ([0, 1, 2].includes(i)) {
+    row = 1;
+  } else if ([3, 4, 5].includes(i)) {
+    row = 2;
+  } else {
+    row = 3;
+  }
+  return { row: row, col: col }
+}
 
 function calculateWinner(squares) {
   const lines = [
