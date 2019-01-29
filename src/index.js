@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
+import SearchAppBar from './components/SearchAppBar';
+import SimpleTable from './components/SimpleTable';
+import AlignItemsList from './components/AlignItemsList'
 import './index.css';
 
 const serverUri = process.env.SERVER_URI || 'http://localhost:8080/api/boards/'
@@ -129,30 +132,66 @@ class Game extends React.Component {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board
-            squares={current.squares}
-            onClick={(i) => this.handleClick(i)}
-          />
-          <Button variant="contained" color="primary" onClick={() => this.saveBoard()}>
-            Save
-          </Button>
-          {/* <button onClick={() => this.saveBoard()}>Save</button> */}
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
+      <div>
+        <SearchAppBar />
+        <div className="game">
+          <div className="game-board">
+            <Board
+              squares={current.squares}
+              onClick={(i) => this.handleClick(i)}
+            />
+            <Button variant="contained" color="primary" onClick={() => this.saveBoard()}>
+              Save
+            </Button>
+          </div>
+          <div className="game-info">
+            <div>{status}</div>
+            <ol>{moves}</ol>
+          </div>
         </div>
       </div>
     );
   }
 }
 
+class List extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      users: [{
+        name: 'Warit',
+        game: '1'
+      },
+      {
+        name: 'Toto',
+        game: '2'
+      }]
+    }
+  }
+
+  render () {
+    const users = this.state.users.map((user, number) => {
+      return (
+        <li key={number}>
+          <div>{user.name}</div>
+        </li>
+      )
+    })
+    return (
+      <div>
+        <SearchAppBar />
+        <ul>{users}</ul>
+        <AlignItemsList />
+      </div>
+    )
+  }
+  
+}
+
 // ========================================
 
 ReactDOM.render(
-  <Game />,
+  <List />,
   document.getElementById('root')
 );
 
