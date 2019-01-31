@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import SearchAppBar from './components/SearchAppBar';
-import SimpleTable from './components/SimpleTable';
 import AlignItemsList from './components/AlignItemsList'
+import Input from '@material-ui/core/Input';
 import './index.css';
 
 const serverUri = process.env.SERVER_URI || 'http://localhost:8080/api/boards/'
@@ -63,6 +63,7 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       xIsNext: true,
+      inputValue: '',
     };
   }
 
@@ -100,11 +101,18 @@ class Game extends React.Component {
         'Accept': 'application/json'
       },
       data: {
+        name: this.state.inputValue,
         history: this.state.history
       }
     })
     .then(function (res) {
-      alert(res.status)
+      alert(res.data.message)
+    })
+  }
+
+  handleInoutChange(event) {
+    this.setState({
+      inputValue: event.target.value
     })
   }
 
@@ -132,22 +140,32 @@ class Game extends React.Component {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
     return (
-      <div>
-        <SearchAppBar />
-        <div className="game">
-          <div className="game-board">
-            <Board
-              squares={current.squares}
-              onClick={(i) => this.handleClick(i)}
-            />
-            <Button variant="contained" color="primary" onClick={() => this.saveBoard()}>
+      <div className="game">
+        <div className="game-board">
+          <Board
+            squares={current.squares}
+            onClick={(i) => this.handleClick(i)}
+          />
+          <div>
+            <Input 
+              placeholder="Name"
+              value={this.state.inputValue}
+              onChange={(event) => this.handleInoutChange(event)}>
+              Name
+            </Input>
+          </div>
+          <div>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => this.saveBoard()}>
               Save
             </Button>
           </div>
-          <div className="game-info">
-            <div>{status}</div>
-            <ol>{moves}</ol>
-          </div>
+        </div>
+        <div className="game-info">
+          <div>{status}</div>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
@@ -182,6 +200,9 @@ class List extends React.Component {
         <SearchAppBar />
         <ul>{users}</ul>
         <AlignItemsList />
+        <div>
+          <Game />
+        </div>
       </div>
     )
   }
