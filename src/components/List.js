@@ -4,6 +4,8 @@ import axios from 'axios';
 import SearchAppBar from './SearchAppBar';
 import AlignItemsList from './AlignItemsList';
 
+const serverUri = process.env.SERVER_URI || 'http://localhost:8080/api/boards/'
+
 class List extends React.Component {
   constructor(props) {
     super(props)
@@ -30,7 +32,16 @@ class List extends React.Component {
   }
 
   componentDidMount() {
-    
+    fetch(serverUri, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+      .then(res => res.json())
+      .then(data => this.setState({
+        users: data
+      }))
   }
 
   render () {
