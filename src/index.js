@@ -2,9 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
-import SearchAppBar from './components/SearchAppBar';
-import AlignItemsList from './components/AlignItemsList'
 import Input from '@material-ui/core/Input';
+import List from './components/List'
 import './index.css';
 
 const serverUri = process.env.SERVER_URI || 'http://localhost:8080/api/boards/'
@@ -170,43 +169,6 @@ class Game extends React.Component {
       </div>
     );
   }
-}
-
-class List extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      users: [{
-        name: 'Warit',
-        game: '1'
-      },
-      {
-        name: 'Toto',
-        game: '2'
-      }]
-    }
-  }
-
-  render () {
-    const users = this.state.users.map((user, number) => {
-      return (
-        <li key={number}>
-          <div>{user.name}</div>
-        </li>
-      )
-    })
-    return (
-      <div>
-        <SearchAppBar />
-        <ul>{users}</ul>
-        <AlignItemsList />
-        <div>
-          <Game />
-        </div>
-      </div>
-    )
-  }
-  
 }
 
 // ========================================
